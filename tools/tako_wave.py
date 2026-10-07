@@ -268,15 +268,40 @@ def build(t, wt):
     css.append(kf('sf', st) + f'.sf{{animation:sf {DUR}s linear infinite}}')
     board = f'<rect x="-14" y="9.5" width="28" height="3.6" rx="1.8" fill="{t["ink"]}"/>'
     body.append(f'<g class="sf"><g transform="translate(0,-4)">{tako(t, 2.0, eyes=("happy",))}</g>{board}</g>')
-    sx, sy = xe + 18, Y(3)
-    for i in range(18):
-        ang = math.pi * (1.05 + .9 * i / 17)
-        dist = 16 + (i % 4) * 9
-        dx, dy = math.cos(ang) * dist, math.sin(ang) * dist - 6
-        a = T1 + 3
-        css.append(kf(f'dr{i}', [(0, 'opacity:0;' + tr(0, 0)), (a, 'opacity:0;' + tr(0, 0)), (a + .3, 'opacity:1;' + tr(0, 0)), (a + 3, 'opacity:1;' + tr(dx, dy)), (a + 6, 'opacity:0;' + tr(dx * 1.2, dy + 14)), (100, 'opacity:0;' + tr(0, 0))]))
-        sz = 4 if i % 2 else 3
-        body.append(f'<rect x="{sx:.1f}" y="{sy}" width="{sz}" height="{sz}" rx=".6" fill="{wt["foam"] if i % 3 == 0 else wt["w"][i % 2]}" style="animation:dr{i} {DUR}s ease-out infinite"/>')
+    # ── 最後のざぶーん：草と同じマスで、水の冠 → しずくが上がって落ちる → 波紋が横へ（コマ送り） ──
+    c0 = max(0, min(COLS - 1, round((xe + 18 - LEFT - CELL / 2) / P)))
+    a = T1 + 1.5
+    def sfc_at(c, p):                                # その列・その時の水面の行（積もった草より下にはならない）
+        c = max(0, min(COLS - 1, c))
+        return max(1, min(6, 7 - max(level(c, 0, p), floor[c])))
+    F, Z, O = 'f', 0, 1
+    def col(n, top, kind_top=F, kind=O): return [(n, u, kind_top if u == top else kind) for u in range(1, top + 1)]
+    frames = [
+        [(0, 1, F), (-1, 1, Z), (1, 1, Z)],
+        col(-2, 2) + col(-1, 3, F, Z) + [(0, 1, Z)] + col(1, 3, F, Z) + col(2, 2),
+        col(-3, 1) + col(-2, 3) + col(-1, 4, F, Z) + col(0, 2, F, Z) + col(1, 4, F, Z) + col(2, 3) + col(3, 1)
+        + [(0, 6, F), (-2, 6, Z), (2, 7, Z), (-3, 5, F), (3, 5, F)],
+        col(-4, 1, F) + col(-3, 1) + col(-2, 2) + col(-1, 3, F, Z) + col(1, 3, F, Z) + col(2, 2) + col(3, 1) + col(4, 1, F)
+        + [(0, 7, F), (-2, 7, Z), (2, 8, Z), (-4, 5, F), (4, 6, F)],
+        col(-5, 1, F) + col(-4, 1) + col(-3, 1) + col(-2, 1) + col(-1, 2, F, Z) + col(1, 2, F, Z) + col(2, 1) + col(3, 1) + col(4, 1) + col(5, 1, F)
+        + [(0, 5, F), (-2, 5, Z), (2, 6, Z), (-5, 3, F), (5, 4, F)],
+        col(-6, 1, F) + col(-5, 1, Z) + col(-4, 1, Z) + col(-3, 1, Z) + col(3, 1, Z) + col(4, 1, Z) + col(5, 1, Z) + col(6, 1, F)
+        + [(0, 3, F), (-2, 2, Z), (2, 3, Z), (-6, 1, F), (6, 2, F)],
+        col(-7, 1, F) + col(-6, 1, Z) + col(-5, 1, F) + col(5, 1, F) + col(6, 1, Z) + col(7, 1, F) + [(0, 1, F)],
+    ]
+    STEP = 1.3
+    color_of = {F: wt['foam'], Z: wt['w'][0], O: wt['w'][1]}
+    k = 0
+    for fi, fr in enumerate(frames):
+        f0, f1 = a + fi * STEP, a + (fi + 1) * STEP
+        for dc, up, kind in fr:
+            c = c0 + dc
+            r = sfc_at(c, f0) - up               # 各列の水面の上に積む
+            x, y = X(c), Y(r)
+            if r < -3 or not 0 <= c < COLS: continue      # 草の外の列には出さない（水がないので浮いて見える）
+            css.append(kf(f'z{k}', [(0, 'opacity:0'), (f0 - .01, 'opacity:0'), (f0, 'opacity:1'), (f1 - .01, 'opacity:1'), (f1, 'opacity:0'), (100, 'opacity:0')]))
+            body.append(f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" fill="{color_of[kind]}" style="opacity:0;animation:z{k} {DUR}s linear infinite"/>')
+            k += 1
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
             f'<style>{LEG_CSS}{"".join(css)}@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}}}</style>'
             f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>{labels(t)}{"".join(body)}</svg>')
