@@ -9,17 +9,15 @@
 　　
 ## 作ったもの　What I've built
 
-- [就活Hub](https://github.com/AnIT012/shukatsu-hub)：就活の選考の進み具合とやることを管理するアプリです。（[公開しています](https://shukatsu-dashboard-sable.vercel.app)）<br>
-  A job-hunting app that tracks where each application stands and what to do next. ([Live](https://shukatsu-dashboard-sable.vercel.app))
-  
+<a href="https://portfolio-site-navy-theta-52.vercel.app/projects/shukatsu"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-shukatsu-dark.svg"><img width="32%" alt="就活Hub：次の一手が前に出て、動いた歩数で花畑が育つ就活管理アプリ。10名以上が利用" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-shukatsu-light.svg"></picture></a> <a href="https://portfolio-site-navy-theta-52.vercel.app/projects/teamy"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-teamy-dark.svg"><img width="32%" alt="TeaMy：8人格のAIが工程ごとに議論して結論を出すAIチーム。コスト約1/3" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-teamy-light.svg"></picture></a> <a href="https://portfolio-site-navy-theta-52.vercel.app/projects/mamebot"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-mamebot-dark.svg"><img width="32%" alt="mamebot：LINEのボタンだけで家族に連絡が届くLINEボット。家族4人が毎日利用" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-mamebot-light.svg"></picture></a>
+
+押すと、課題から読めます（ポートフォリオ）。　Click a card to read the case study.<br>
+コード Code：[就活Hub](https://github.com/AnIT012/shukatsu-hub)（[公開中 Live](https://shukatsu-dashboard-sable.vercel.app)）・ [TeaMy の設計の記録 Design notes](https://github.com/AnIT012/TeaMy-design) ・ [mamebot](https://github.com/AnIT012/mamebot)
+
+### ほかに作ったもの　Other works
+
 - [Ponte](https://github.com/AnIT012/Ponte)：AIと開発するときに、決めていないことをAIに推測させないための言語です。（[試せます](https://anit012.github.io/Ponte/play.html)）<br>
   A language that stops AI from guessing what you haven't decided when building with AI. ([Try it](https://anit012.github.io/Ponte/play.html))
-  
-- [TeaMy](https://github.com/AnIT012/TeaMy-design)：複数のAIがDiscordで話し合って成果物を作る仕組みの、設計の記録です。<br>
-  Design notes for a system where several AIs discuss in Discord and produce real deliverables.
-  
-- [mamebot](https://github.com/AnIT012/mamebot)：家族で使っているLINEボットです。<br>
-  A LINE bot my family uses every day.
   
 - [Teyvat Codex](https://teyvat-codex.pages.dev)：原神の物語と仕様を調べられる、非公式の資料サイトです。<br>
   An unofficial reference site for Genshin Impact's story and game mechanics.
