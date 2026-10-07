@@ -16,4 +16,10 @@ PdMを志望している、情報系の学部3年生です。身近な困りご�
 - [CreateAI](https://github.com/AnIT012/CreateAI)：いくつものアプリをまたいで使える、ローカルLLMのAIエージェントです。
 - [PlanPal](https://github.com/AnIT012/PlanPal)：使う人のことを学んで、ふだんの言葉から予定を提案するカレンダーです。
 
-よく使うもの：Python、Go、TypeScript（Next.js）、PostgreSQL、Firebase、Docker、Claude・GPT・Gemini
+よく使うもの：![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![LLM](https://img.shields.io/badge/LLM-Claude%20%2F%20GPT%20%2F%20Gemini-FF6F61)
