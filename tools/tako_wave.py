@@ -47,14 +47,31 @@ def Y(r): return TOPM + PAD + r * P
 # GitHub の草の色（ライト／ダーク）と、たこの色
 THEMES = {
     # 草の色・文字の色は、GitHub のプロフィールの本物から測った値（2026-10-07）
-    'light': dict(bg='#ffffff', cells=['#eff2f5', '#aceebb', '#4ac26b', '#2da44e', '#116329'], fg='#1f2328', muted='#59636e', tako='#d97757', eye='#1f2328', ink='#2b2320'),
-    'dark': dict(bg='#0d1117', cells=['#151b23', '#033a16', '#196c2e', '#2ea043', '#56d364'], fg='#f0f6fc', muted='#9198a1', tako='#e08a6c', eye='#0d1117', ink='#c9d1d9'),
+    'light': dict(bg='#ffffff', cells=['#eff2f5', '#aceebb', '#4ac26b', '#2da44e', '#116329'], fg='#1f2328', muted='#59636e', tako='#e2606e', cheek='#ffb0bb', eye='#1f2328', sprout='#2da44e', feet='#b4404d', ink='#2b2320'),
+    'dark': dict(bg='#0d1117', cells=['#151b23', '#033a16', '#196c2e', '#2ea043', '#56d364'], fg='#f0f6fc', muted='#9198a1', tako='#e2606e', cheek='#ffb0bb', eye='#1f2328', sprout='#56d364', feet='#b4404d', ink='#c9d1d9'),
 }
 
 # ── 自作のたこ。体・目（表情ごと）・足（2コマ）を分けて、表情を切り替えられるように ──
 BODY = ["...1111...", ".11111111.", "1111111111", "1111111111", "1111111111", "1111111111", ".11111111."]
 LEGS_A = ["1.1.11.1.1", "1..1..1..1"]
 LEGS_B = [".1.1..1.1.", ".1..11..1."]
+CHEEKS = [(1, 5), (8, 5)]   # ほっぺ
+# ── キャラ：ブロックの子（草のマスと同じ四角・頭に芽・べに・ほっぺ）。1=体 e=目 c=ほっぺ g=芽 d=足 ──
+CHARA = [".....gg.....", "....g.......", "..11111111..", "..11111111..", "..1e1111e1..", "..1e1111e1..", "..c111111c..", "..11111111..", "...d....d..."]
+CHARA_BLINK = [(3, 4), (8, 4)]          # まばたきで隠す目の上の段
+CPX = 3.0                               # ドット1つの大きさ
+
+
+def chara(t, px=CPX, feet=False, blink=False):
+    """feet=True なら原点が足の下のまん中、False なら絵のまん中"""
+    w, h = 12 * px, 9 * px
+    ox, oy = -w / 2, (-h if feet else -h / 2)
+    col = {'1': t['tako'], 'e': t['eye'], 'c': t['cheek'], 'g': t['sprout'], 'd': t['feet']}
+    r = [f'<rect x="{x*px + ox:.2f}" y="{y*px + oy:.2f}" width="{px+.05:.2f}" height="{px+.05:.2f}" fill="{col[ch]}"/>'
+         for y, row in enumerate(CHARA) for x, ch in enumerate(row) if ch != '.']
+    if blink:
+        r.append('<g class="bk">' + ''.join(f'<rect x="{x*px + ox:.2f}" y="{y*px + oy:.2f}" width="{px+.05:.2f}" height="{px+.05:.2f}" fill="{t["tako"]}"/>' for x, y in CHARA_BLINK) + '</g>')
+    return ''.join(r)
 EYES = {
     'open': [(2, 3), (2, 4), (7, 3), (7, 4)],
     'shut': [(2, 4), (3, 4), (6, 4), (7, 4)],
@@ -80,6 +97,7 @@ def tako(t, px, eyes=('open',), eye_cls=None, body_cls='', legs=True):
     if legs:
         s.append(f'<g class="la">{rects(grid_of(LEGS_A), px, 7)}</g><g class="lb">{rects(grid_of(LEGS_B), px, 7)}</g>')
     s.append('</g>')
+    s.append(f'<g fill="{t["cheek"]}">{rects(CHEEKS, px)}</g>')
     for e in eyes:
         cls = (eye_cls or {}).get(e, '')
         s.append(f'<g class="{cls}" fill="{t["eye"]}">{rects(EYES[e], px)}</g>')
@@ -95,6 +113,7 @@ WATER = {
     'dark': dict(foam='#cae8ff', w=['#3d8fe0', '#2a6fc9', '#1d54a3', '#123a75']),
 }
 DUR = 20
+DUR_W = 20                # 草の動き1周の秒数
 R0 = 4                    # 波紋の始まり
 RV = .2                   # 波紋が1マス進む時間（%）
 CENTER = ((COLS - 1) / 2, 3)
@@ -114,9 +133,16 @@ for c in range(COLS):
         dest[d[4]] = 7 - len(g) + k
 
 
+TOFF, TSC, PARTS = 0.0, 1.0, False   # 上の大きな絵に入れる時：時刻 p → TOFF + p×TSC、絵の枠を付けずに中身だけ返す
+
+
 def kf(name, stops):
     st = {}
-    for p, v in stops: st[round(max(0, min(100, p)), 3)] = v
+    stops = sorted(stops, key=lambda q: q[0])
+    if TOFF > 0: st[0.0] = stops[0][1]
+    for p, v in stops:
+        p = TOFF + p * TSC
+        st[round(max(0, min(100, p)), 3)] = v
     return f'@keyframes {name}{{' + ''.join(f'{p:g}%{{{v}}}' for p, v in sorted(st.items())) + '}'
 
 
@@ -287,8 +313,8 @@ def build(t, wt):
         st.append((T1 - 6 + 9 * u, tr(xe + 18 * u, Yb - 30 * math.sin(math.pi * u) + 46 * u * u, f' rotate({360 * u:.0f}deg)') + ';opacity:1'))
     st += [(T1 + 3.1, tr(xe + 18, Yb + 46, ' rotate(360deg)') + ';opacity:0'), (100, tr(X(0) - 30, Yb, ' rotate(0deg)') + ';opacity:0')]
     css.append(kf('sf', st) + f'.sf{{animation:sf {DUR}s linear infinite}}')
-    board = f'<rect x="-14" y="9.5" width="28" height="3.6" rx="1.8" fill="{t["ink"]}"/>'
-    body.append(f'<g class="sf"><g transform="translate(0,-4)">{tako(t, 2.0, eyes=("happy",))}</g>{board}</g>')
+    board = f'<rect x="-16" y="{9 * CPX / 2 - 4:.1f}" width="32" height="3.6" rx="1.8" fill="{t["ink"]}"/>'
+    body.append(f'<g class="sf"><g transform="translate(0,-4)">{chara(t, blink=True)}</g>{board}</g>')
     # ── 最後のざぶーん：草と同じマスで、水が噴き出す（冠 → しずくが上がって落ちる）。そのあと水があふれる ──
     c0, a = C0, SPLASH
     def sfc_at(c, p):                                # その列・その時の水面の行（積もった草より下にはならない）
@@ -319,6 +345,7 @@ def build(t, wt):
             css.append(kf(f'z{k}', [(0, 'opacity:0'), (f0 - .01, 'opacity:0'), (f0, 'opacity:1'), (f1 - .01, 'opacity:1'), (f1, 'opacity:0'), (100, 'opacity:0')]))
             body.append(f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" fill="{color_of[kind]}" style="opacity:0;animation:z{k} {DUR}s linear infinite"/>')
             k += 1
+    if PARTS: return css, labels(t) + ''.join(body)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
             f'<style>{LEG_CSS}{"".join(css)}@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}}}</style>'
             f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>{labels(t)}{"".join(body)}</svg>')
@@ -346,6 +373,149 @@ def labels(t):
     return ''.join(s)
 
 
+
+# ════════════════════════════════════════════════════════════
+# README のいちばん上の大きな絵：タイトル「AnIT」→ 自己紹介 → 草。たこは重力ありで、上から順に全部を渡っていく
+# ════════════════════════════════════════════════════════════
+HD = 44.5                    # 1周の秒数
+W0 = 24.5                    # 草の動き（20 秒ぶん）が始まる秒
+HS, HB = 10, 8               # タイトルの文字のマスの間隔・大きさ
+HTOP = 76                    # タイトルの文字の上のあき（跳んだ時に頭が切れないように）
+LETTERS = [
+    ('A', 0, [".111.", "1...1", "1...1", "11111", "1...1", "1...1", "1...1"]),
+    ('n', 6, [".....", ".....", "1111.", "1...1", "1...1", "1...1", "1...1"]),
+    ('I', 12, ["111", ".1.", ".1.", ".1.", ".1.", ".1.", "111"]),
+    ('T', 16, ["11111", "..1..", "..1..", "..1..", "..1..", "..1..", "..1.."]),
+]
+# 文と文のあいだを1行ぶん空けて、キャラはそこ（文のすぐ上の通り道）を歩く。下の通り道へは、文のない左右の端で落ちる
+INTRO = [  # (文, ベースライン y, 1文字のおおよその幅)
+    ('PdM・SA・TS・DX人材志望の大学3年生です。自分や周りの困りごとを見つけて、', 200, 14),
+    ('要件と設計を自分で考え、実装はAIに手伝ってもらってプロダクトを作っています。', 250, 14),
+    ('Aspiring PdM, solutions architect, technical support engineer, or DX specialist.', 300, 7.2),
+    ('I find problems around me, design the requirements myself, and build products with AI.', 350, 7.2),
+]
+WY = 362                     # 草の絵を置く高さ
+HW, HH = W, WY + H
+
+
+def hx(c): return LEFT + c * HS
+def hy(r): return HTOP + r * HS
+def hp(sec): return sec / HD * 100
+
+
+def hero_tako(t):
+    return chara(t, feet=True, blink=True)
+
+
+def hero_path():
+    """(秒, x, y, 形の変化)。跳ぶ・落ちるは放物線（重力）"""
+    path = []
+    def at(sec, xy, ex=''): path.append((sec, xy[0], xy[1], ex))
+    def walk(t0, t1, a, b):
+        n = max(2, int((t1 - t0) * 6))
+        for k in range(n + 1):
+            u = k / n
+            at(t0 + (t1 - t0) * u, (a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u - 3.5 * abs(math.sin(u * math.pi * n / 2))))
+    def jump(t0, t1, a, b, hgt):
+        at(t0 - .12, a, ' scale(1.12,.85)')
+        for k in range(1, 13):
+            u = k / 12
+            at(t0 + (t1 - t0) * u, (a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u - hgt * 4 * u * (1 - u)), ' scale(.92,1.1)' if u < .5 else '')
+        at(t1 + .1, b, ' scale(1.18,.8)')
+        at(t1 + .25, b)
+    def drop(t0, t1, a, b):
+        """前に一歩出て、重力で落ちる"""
+        for k in range(0, 11):
+            u = k / 10
+            at(t0 + (t1 - t0) * u, (a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u * u))
+        at(t1 + .1, b, ' scale(1.15,.82)')
+        at(t1 + .25, b)
+    fl = hy(6) + HB
+    A_top, I_top, T_top = (hx(2) + 4, hy(0)), (hx(13) + 4, hy(0)), (hx(18) + 4, hy(0))
+    n_l, n_r = (hx(6) + 8, hy(2)), (hx(9) + 2, hy(2))
+    gap = (hx(11) + 4, fl)
+    lane = lambda k: INTRO[k][1] - 14                  # 文 k のすぐ上の通り道（足の高さ）
+    L, R = 22, HW - 40                                  # 文のない左右の端
+    walk(0, 1.3, (-20, fl), (hx(-1) - 4, fl))
+    jump(1.4, 2.2, (hx(-1) - 4, fl), A_top, 34)
+    walk(2.4, 2.8, A_top, (A_top[0] + 6, A_top[1]))
+    jump(2.95, 3.6, (A_top[0] + 6, A_top[1]), n_l, 22)
+    walk(3.8, 4.5, n_l, n_r)
+    jump(4.65, 5.3, n_r, gap, 14)                       # n と I のあいだに割り込む
+    for k, sx in enumerate([1.25, .85, 1.15, .92, 1.08, 1.0]):
+        at(5.6 + k * .22, gap, f' scale({sx},{2 - sx:.2f})')
+    jump(7.0, 7.8, gap, I_top, 50)
+    jump(8.1, 8.8, I_top, T_top, 20)
+    for k in range(6):                                   # T の上でぴょこぴょこ
+        at(9.1 + k * .22, (T_top[0], T_top[1] - (3 if k % 2 else 0)))
+    jump(10.6, 11.4, T_top, (280, lane(0)), 14)
+    walk(11.6, 13.4, (280, lane(0)), (R, lane(0)))
+    drop(13.5, 13.9, (R, lane(0)), (R, lane(1)))
+    walk(14.1, 16.9, (R, lane(1)), (L, lane(1)))
+    drop(17.0, 17.4, (L, lane(1)), (L, lane(2)))
+    walk(17.6, 20.4, (L, lane(2)), (R, lane(2)))
+    drop(20.5, 20.9, (R, lane(2)), (R, lane(3)))
+    walk(21.1, 23.8, (R, lane(3)), (L + 18, lane(3)))
+    # 草の左の「Mon」の上で待つ（波紋が来たら、びくっと跳ねる）
+    mon = (LEFT - 18, WY + Y(1) - 2)
+    drop(23.9, 24.4, (L + 18, lane(3)), mon)
+    rip = W0 + (R0 + abs(0 - CENTER[0]) * RV) * DUR_W / 100
+    at(rip - .05, mon); at(rip + .25, (mon[0], mon[1] - 10), ' scale(.9,1.12)'); at(rip + .5, mon, ' scale(1.15,.85)'); at(rip + .7, mon)
+    for k in range(10):
+        at(rip + 1 + k * .45, (mon[0], mon[1] - (1.5 if k % 2 else 0)))
+    # 波が来たら飛び乗る（ここから草の中の波乗りのたこに入れ替わる）
+    pw = T0 + 1.5
+    wx = X(0) + crest(pw) * P + 4
+    wy = WY + Y(7 - crest_h(crest(pw))) - 17 - 4 + 9 * CPX / 2
+    handoff = W0 + pw * DUR_W / 100
+    jump(handoff - .55, handoff - .02, mon, (wx, wy), 10)
+    path.append((handoff, wx, wy, ';opacity:0'))
+    path.append((HD - .05, -20, fl, ';opacity:0'))
+    path.append((HD, -20, fl, ''))
+    path.sort(key=lambda q: q[0])
+    # 入れ替わったあとは見えない
+    out = []
+    for sec, x, y, ex in path:
+        op = 0 if handoff <= sec < HD - .01 else 1
+        ex = ex.replace(';opacity:0', '')
+        out.append((hp(sec), f'transform:translate({x:.1f}px,{y:.1f}px){ex};opacity:{op}'))
+    return out
+
+
+def hero(t, wt):
+    global TOFF, TSC, PARTS, DUR
+    TOFF, TSC, PARTS, DUR = W0 / HD * 100, DUR_W / HD, True, HD
+    wcss, wbody = build(t, wt)
+    TOFF, TSC, PARTS, DUR = 0.0, 1.0, False, DUR_W
+    css = list(wcss)
+    css.append('.bk{opacity:0;animation:bk 3.1s steps(1) infinite}@keyframes bk{0%,90%{opacity:0}91%,96%{opacity:1}97%,100%{opacity:0}}')
+    body = []
+    # タイトルの文字：割り込まれた時に左右へ開いて、ばねで戻る
+    for name, c0, rows in LETTERS:
+        side = -1 if name in 'An' else 1
+        amt = 12 * (1 if name in 'nI' else .55)
+        st = [(0, 0), (5.25, 0), (5.45, side * amt), (6.7, side * amt), (7.05, side * amt * 1.1), (7.3, -side * amt * .25), (7.5, side * amt * .1), (7.7, 0), (HD, 0)]
+        css.append(f'@keyframes L{name}{{' + ''.join(f'{hp(sec):.3f}%{{transform:translateX({v:.1f}px)}}' for sec, v in st) + '}')
+        rects_ = ''.join(f'<rect x="{hx(c0 + cc)}" y="{hy(r)}" width="{HB}" height="{HB}" rx="1.6" fill="{t["fg"]}"/>'
+                         for r, row in enumerate(rows) for cc, ch in enumerate(row) if ch == '1')
+        body.append(f'<g style="animation:L{name} {HD}s linear infinite">{rects_}</g>')
+    # 「built with AI」のバッジ（たこの色）
+    bx, by = hx(21) + 16, hy(3) - 6
+    body.append(f'<g font-family="Verdana,DejaVu Sans,sans-serif" font-size="11"><rect x="{bx}" y="{by}" width="62" height="20" rx="3" fill="#555"/>'
+                f'<rect x="{bx + 62}" y="{by}" width="26" height="20" rx="3" fill="{t["tako"]}"/><rect x="{bx + 62}" y="{by}" width="4" height="20" fill="{t["tako"]}"/>'
+                f'<text x="{bx + 7}" y="{by + 14}" fill="#fff">built with</text><text x="{bx + 68}" y="{by + 14}" fill="#fff">AI</text></g>')
+    # 自己紹介
+    font = 'font-family="-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Noto Sans&quot;,Meiryo,sans-serif" font-size="14"'
+    body.append(f'<g {font} fill="{t["fg"]}">' + ''.join(f'<text x="{LEFT}" y="{y}">{txt}</text>' for txt, y, _ in INTRO) + '</g>')
+    body.append(f'<g transform="translate(0,{WY})">{wbody}</g>')
+    css.append(f'@keyframes hk{{' + ''.join(f'{p:.3f}%{{{v}}}' for p, v in hero_path()) + '}' + f'.hk{{animation:hk {HD}s linear infinite}}')
+    body.append(f'<g class="hk">{hero_tako(t)}</g>')
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {HW} {HH}" width="{HW}" height="{HH}">'
+            f'<title>AnIT</title><style>{LEG_CSS}{"".join(css)}@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}.hk{{opacity:0}}}}</style>'
+            f'<rect width="{HW}" height="{HH}" fill="{t["bg"]}"/>{"".join(body)}</svg>')
+
+
 for th, t in THEMES.items():
     open(os.path.join(out, f'tako-wave-{th}.svg'), 'w').write(build(t, WATER[th]))
+    open(os.path.join(out, f'tako-hero-{th}.svg'), 'w').write(hero(t, WATER[th]))
 print('ok', COLS, 'weeks', len(GRASS), 'days with grass')

@@ -1,15 +1,9 @@
-<h1>AnIT <img src="assets/tako.svg" height="30" alt="たこ"> <img src="https://img.shields.io/badge/built%20with-AI-d97757?style=flat-square" alt="Built with AI"></h1>
-
-PdM・SA・TS・DX人材志望の大学3年生です。自分や周りの困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらってプロダクトを作っています。
-
-Aspiring PdM, solutions architect, technical support engineer, or DX specialist. I find problems around me, design the requirements myself, and build products with AI.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-hero-dark.svg">
+  <img alt="AnIT。PdM・SA・TS・DX人材志望の大学3年生です。自分や周りの困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらってプロダクトを作っています。Aspiring PdM, solutions architect, technical support engineer, or DX specialist. I find problems around me, design the requirements myself, and build products with AI." src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-hero-light.svg">
+</picture>
 
 [ポートフォリオ Portfolio](https://portfolio-site-navy-theta-52.vercel.app) ・ [記事 Articles (Zenn)](https://zenn.dev/anit)
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-dark.svg">
-  <img alt="この1年の草の上で、たこが波乗りするアニメーション" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-light.svg">
-</picture>
 
 ## 作ったもの　What I've built
 
