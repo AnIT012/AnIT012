@@ -1,7 +1,7 @@
 # AnIT
 
-PdMを志望している、情報系の学部3年生です。身近な困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらいながら作っています。
-Aspiring PdM. I find everyday problems, design the requirements myself, and build with AI.
+PdM・SA・TS・DX人材志望の大学3年生です。自分や周りの困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらってプロダクトを作っています。
+Aspiring PdM, solutions architect, technical support engineer, or DX specialist. I find problems around me, design the requirements myself, and build products with AI.
 
 [ポートフォリオ](https://portfolio-site-navy-theta-52.vercel.app) ・ [Zenn](https://zenn.dev/anit)
 <picture>
