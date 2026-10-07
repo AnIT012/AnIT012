@@ -1,6 +1,6 @@
 <div align="center">
 
-# しょすけ / AnIT 🍵
+# AnIT 🍵
 
 ### PdM志望 ｜ 要件定義・設計を担当、実装はAIを駆使 ｜ 身近な課題を 0→1 でプロダクト化
 
@@ -8,7 +8,7 @@
 ![style](https://img.shields.io/badge/設計-自分-0E8A16?style=for-the-badge)
 ![style2](https://img.shields.io/badge/実装-AIを駆使-8A2BE2?style=for-the-badge)
 
-立命館大学 情報理工学部 知能情報学科 ｜ TOEIC 905
+情報系の学部3年生 ｜ TOEIC 905
 
 </div>
 
