@@ -13,7 +13,7 @@ Aspiring PdM, solutions architect, technical support engineer, or DX specialist.
 
 
 
-## 作ったもの
+## 作ったもの　What I made
 
 - [就活Hub](https://github.com/AnIT012/shukatsu-hub)：就活の選考の進み具合とやることを管理するアプリです。（[公開しています](https://shukatsu-dashboard-sable.vercel.app)）
 - [Ponte](https://github.com/AnIT012/Ponte)：AIと開発するときに、決めていないことをAIに推測させないための言語です。（[試せます](https://anit012.github.io/Ponte/play.html)）
@@ -25,7 +25,7 @@ Aspiring PdM, solutions architect, technical support engineer, or DX specialist.
 - [CreateAI](https://github.com/AnIT012/CreateAI)：いくつものアプリをまたいで使える、ローカルLLMのAIエージェントです。
 - [PlanPal](https://github.com/AnIT012/PlanPal)：使う人のことを学んで、ふだんの言葉から予定を提案するカレンダーです。
 
-よく使うもの：![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+よく使うもの What I use：![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)
