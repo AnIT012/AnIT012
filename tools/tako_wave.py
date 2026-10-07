@@ -101,8 +101,7 @@ CENTER = ((COLS - 1) / 2, 3)
 S0 = 15                   # 草が沈み始める
 T0, T1 = 30, 76           # 波の頂上が左の外→右の外へ
 X0, X1 = -4.0, COLS + 2.0
-D0 = 86                   # 水が引き始める
-U0 = 88                   # 草が浮かんで戻り始める
+D0 = 200                  # （たまった水は、最後に下の「水だけ捌ける」で引く）
 BASE = 2                  # たまる水の深さ（下から2段）
 
 # 列ごとの床の高さ（その週に草があった日数）と、草それぞれの行き先
@@ -164,6 +163,23 @@ def level(c, r, p):
     return int(h + .35)
 
 
+XE = X(0) + crest(T1 - 6) * P + 4                  # たこが宙返りして落ちる所
+C0 = max(0, min(COLS - 1, round((XE + 18 - LEFT - CELL / 2) / P)))
+SPLASH = T1 + 1.5
+RC0 = max(1, min(6, 7 - max(level(C0, 0, SPLASH), floor[C0])))
+FL0 = SPLASH + 2.6                                  # 冠が上がりきってから、水があふれ始める
+
+
+def flood_at(c, r):
+    """ざぶーんの所から波紋状に、そのマスが水で埋まる時刻"""
+    return FL0 + math.hypot(c - C0, (r - RC0) * 1.2) * .12
+
+
+def drain_at(r):
+    """水が上の段から捌けていく時刻"""
+    return 90 + r * .9
+
+
 def lip(c, p):
     if not (T0 <= p <= T1): return set()
     x = crest(p); d = x - c
@@ -193,7 +209,7 @@ def build(t, wt):
         prev = (empty, 1.0)
         for p in steps:
             h = level(c, r, p)
-            onfloor = r >= 7 - floor[c] and p >= S0 + 6 and p < U0 + 6
+            onfloor = r >= 7 - floor[c] and p >= S0 + 6
             if r in lip(c, p): col = wt['foam']
             elif h > 0 and r >= 7 - h and not onfloor: col = water_color(wt, r, h)
             else: col = empty
@@ -203,6 +219,11 @@ def build(t, wt):
                 if 0 <= u <= 1:
                     sc = max(sc, 1 + amp * math.sin(math.pi * u))
                     if col == empty: col = wc
+            tfc = flood_at(c, r)
+            if p >= tfc:                                   # ざぶーんのあと、波紋状に水が埋まる → 上から捌ける
+                if p >= drain_at(r): col = empty
+                elif p < tfc + .6 or (r > 0 and p >= drain_at(r - 1)): col = wt['foam']
+                else: col = wt['w'][(0, 0, 1, 1, 2, 2, 3)[r]]
             sc = round(sc, 2)
             if (col, sc) != prev:
                 if col != prev[0]: st.append((p - .01, f'fill:{prev[0]};transform:scale({prev[1]})'))
@@ -231,12 +252,12 @@ def build(t, wt):
         # 波が上を通る時、床がほんの少し沈む
         pc = T0 + (T1 - T0) * (c - X0) / (X1 - X0)
         st += [(pc - .5, tr(0, dy, ' scale(1)')), (pc + .3, tr(0, dy + 1.5, ' scale(1)')), (pc + 1.5, tr(0, dy, ' scale(1)'))]
-        a = U0 + (COLS - 1 - c) * .06 + (6 - r) * .15
+        a = flood_at(c, dest[idx]) + .4                    # 水が来たら、ふわっと浮いて自分の日へ
         st.append((a, tr(0, dy, ' scale(1)')))
         for k in range(1, 9):
             u = k / 8
             e = 1 - (1 - u) ** 2
-            st.append((a + 4 * u, tr(0, dy * (1 - e), ' scale(1)')))
+            st.append((a + 3.5 * u, tr(0, dy * (1 - e) - 3 * math.sin(math.pi * u), ' scale(1)')))
         st.append((100, tr(0, 0, ' scale(1)')))
         st.sort(key=lambda x: x[0])
         css.append(kf(f'g{idx}', st))
@@ -268,9 +289,8 @@ def build(t, wt):
     css.append(kf('sf', st) + f'.sf{{animation:sf {DUR}s linear infinite}}')
     board = f'<rect x="-14" y="9.5" width="28" height="3.6" rx="1.8" fill="{t["ink"]}"/>'
     body.append(f'<g class="sf"><g transform="translate(0,-4)">{tako(t, 2.0, eyes=("happy",))}</g>{board}</g>')
-    # ── 最後のざぶーん：草と同じマスで、水の冠 → しずくが上がって落ちる → 波紋が横へ（コマ送り） ──
-    c0 = max(0, min(COLS - 1, round((xe + 18 - LEFT - CELL / 2) / P)))
-    a = T1 + 1.5
+    # ── 最後のざぶーん：草と同じマスで、水が噴き出す（冠 → しずくが上がって落ちる）。そのあと水があふれる ──
+    c0, a = C0, SPLASH
     def sfc_at(c, p):                                # その列・その時の水面の行（積もった草より下にはならない）
         c = max(0, min(COLS - 1, c))
         return max(1, min(6, 7 - max(level(c, 0, p), floor[c])))
@@ -285,9 +305,6 @@ def build(t, wt):
         + [(0, 7, F), (-2, 7, Z), (2, 8, Z), (-4, 5, F), (4, 6, F)],
         col(-5, 1, F) + col(-4, 1) + col(-3, 1) + col(-2, 1) + col(-1, 2, F, Z) + col(1, 2, F, Z) + col(2, 1) + col(3, 1) + col(4, 1) + col(5, 1, F)
         + [(0, 5, F), (-2, 5, Z), (2, 6, Z), (-5, 3, F), (5, 4, F)],
-        col(-6, 1, F) + col(-5, 1, Z) + col(-4, 1, Z) + col(-3, 1, Z) + col(3, 1, Z) + col(4, 1, Z) + col(5, 1, Z) + col(6, 1, F)
-        + [(0, 3, F), (-2, 2, Z), (2, 3, Z), (-6, 1, F), (6, 2, F)],
-        col(-7, 1, F) + col(-6, 1, Z) + col(-5, 1, F) + col(5, 1, F) + col(6, 1, Z) + col(7, 1, F) + [(0, 1, F)],
     ]
     STEP = 1.3
     color_of = {F: wt['foam'], Z: wt['w'][0], O: wt['w'][1]}
