@@ -10,6 +10,10 @@
 
 情報系の学部3年生 ｜ TOEIC 905
 
+### 🌐 [ポートフォリオサイト](https://portfolio-site-navy-theta-52.vercel.app)
+
+各プロダクトの課題・判断・画面をまとめています
+
 </div>
 
 ---
@@ -22,13 +26,19 @@
 
 ---
 
-## 🚀 代表プロダクト
+## 🚀 プロダクト
 
-| | プロダクト | 概要 |
-|---|---|---|
-| 🍵 | **[TeaMy-design](https://github.com/annonymousIT/TeaMy-design)** | 自分専用のAIチームがDiscordで議論し成果物を納品するシステムの **設計判断ログ**（実装は非公開・思考だけ公開） |
-| 🫘 | **[mamebot](https://github.com/annonymousIT/mamebot)** | 家族4人で **本稼働中** のLINEボット。Webアプリから「使われる形」へピボットした 0→1 |
-| 📅 | **[PlanPal](https://github.com/annonymousIT/PlanPal)** | あなたを学ぶ **AIカレンダー**（Go + Next.js + Gemini）。自然言語で予定提案 |
+プロダクト名から、ポートフォリオサイトの各ページに移動します。
+
+| | プロダクト | 概要 | 状態 | リンク |
+|---|---|---|---|---|
+| 🍵 | **[TeaMy](https://portfolio-site-navy-theta-52.vercel.app/projects/teamy)** | Discordで議論するAIチーム。**コスト約1/3（1タスク20円前後）** | 運用中（身内で運用・サブスクは準備中） | [LP](https://teamy-lp.vercel.app/) ・ [設計判断ログ](https://github.com/AnIT012/TeaMy-design)（本体は非公開） |
+| 🌱 | **[就活Hub](https://portfolio-site-navy-theta-52.vercel.app/projects/shukatsu)** | 「次の一手」が主役の就活管理PWA。**10名以上が利用** | 運用中・本選考で使用 | [アプリ](https://shukatsu-dashboard-sable.vercel.app/lp) ・ [GitHub](https://github.com/AnIT012/shukatsu-hub) |
+| 🫘 | **[mamebot](https://portfolio-site-navy-theta-52.vercel.app/projects/mamebot)** | 家族の情報共有LINEボット。専用アプリは開いてもらえず、毎日開くLINEに乗せ直した。**家族4人が毎日利用**・自宅の Mac mini で稼働 | 運用中 | [GitHub](https://github.com/AnIT012/mamebot) |
+| 🌉 | **[Ponte](https://portfolio-site-navy-theta-52.vercel.app/projects/ponte)** | 決めたことを曖昧さなく渡すための言語。**研究で起きた7件の事故をすべて検知** | 公開中・自分の研究に適用中 | [ブラウザで試す](https://anit012.github.io/Ponte/) ・ [GitHub](https://github.com/AnIT012/Ponte) |
+| 📅 | **[PlanPal](https://portfolio-site-navy-theta-52.vercel.app/projects/planpal)** | あなたを学ぶカレンダー（Go + Next.js + Gemini）。**ことばで頼むと3つの候補** | 開発中 (Phase 1 / MVP) | [GitHub](https://github.com/AnIT012/PlanPal) |
+| 🏋️ | **[GymLog](https://portfolio-site-navy-theta-52.vercel.app/projects/gymlog)** | 「次の1セット」が主役の筋トレ記録（iOS / SwiftUI）。**次の1セットが片手で数秒** | 運用中（自分で使用・App Store は未リリース） | 本体は非公開 |
+| 🎙️ | **[MyAgent](https://portfolio-site-navy-theta-52.vercel.app/projects/myagent)** | 声だけでPCが動く、世話焼きエージェント。**機能は設定表に1行足すだけ** | 運用中（個人利用） | [GitHub](https://github.com/AnIT012/MyAgent) |
 
 ---
 
@@ -38,6 +48,8 @@
 ![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-F05138?logo=swift&logoColor=white)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-0D96F6?logo=swift&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 ![LLM](https://img.shields.io/badge/LLM-Claude%20%2F%20GPT%20%2F%20Gemini-FF6F61)
@@ -46,6 +58,6 @@
 
 <div align="center">
 
-📝 [Zenn](https://zenn.dev/anit) ｜ 身近な「あったらいいな」を、最短で動くものにします。
+🌐 [ポートフォリオ](https://portfolio-site-navy-theta-52.vercel.app) ｜ 📝 [Zenn](https://zenn.dev/anit) ｜ 身近な「あったらいいな」を、最短で動くものにします。
 
 </div>
