@@ -36,16 +36,19 @@ for c, w in enumerate(cal['weeks']):
 COLS = len(cal['weeks'])
 GRASS = [d for d in days if d[2]]
 P, CELL, PAD, TOPM = 13, 10, 12, 34
+LEFT = PAD + 31            # 左に曜日（本物と同じく、マスの31px左）
+FOOT = 123                 # マスの上端から、下の「Learn how…」「Less □ More」の下まで
 GW = COLS * P - 3
-W = PAD * 2 + GW + 30
-H = TOPM + PAD * 2 + 7 * P - 3
-def X(c): return PAD + c * P
+W = LEFT + GW + PAD + 30
+H = TOPM + PAD + FOOT
+def X(c): return LEFT + c * P
 def Y(r): return TOPM + PAD + r * P
 
 # GitHub の草の色（ライト／ダーク）と、たこの色
 THEMES = {
-    'light': dict(bg='#ffffff', cells=['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'], tako='#d97757', eye='#1f2328', ink='#2b2320'),
-    'dark': dict(bg='#0d1117', cells=['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'], tako='#e08a6c', eye='#0d1117', ink='#c9d1d9'),
+    # 草の色・文字の色は、GitHub のプロフィールの本物から測った値（2026-10-07）
+    'light': dict(bg='#ffffff', cells=['#eff2f5', '#aceebb', '#4ac26b', '#2da44e', '#116329'], fg='#1f2328', muted='#59636e', tako='#d97757', eye='#1f2328', ink='#2b2320'),
+    'dark': dict(bg='#0d1117', cells=['#151b23', '#033a16', '#196c2e', '#2ea043', '#56d364'], fg='#f0f6fc', muted='#9198a1', tako='#e08a6c', eye='#0d1117', ink='#c9d1d9'),
 }
 
 # ── 自作のたこ。体・目（表情ごと）・足（2コマ）を分けて、表情を切り替えられるように ──
@@ -276,7 +279,29 @@ def build(t, wt):
         body.append(f'<rect x="{sx:.1f}" y="{sy}" width="{sz}" height="{sz}" rx=".6" fill="{wt["foam"] if i % 3 == 0 else wt["w"][i % 2]}" style="animation:dr{i} {DUR}s ease-out infinite"/>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
             f'<style>{LEG_CSS}{"".join(css)}@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}}}</style>'
-            f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>{"".join(body)}</svg>')
+            f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>{labels(t)}{"".join(body)}</svg>')
+
+
+def labels(t):
+    """本物の草と同じ文字：上に月、左に Mon/Wed/Fri、下に「Learn how we count contributions」と「Less □□□□□ More」"""
+    font = 'font-family="-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,&quot;Noto Sans&quot;,Helvetica,Arial,sans-serif" font-size="12"'
+    s = [f'<g {font}>']
+    firsts = [datetime.date.fromisoformat(w['contributionDays'][0]['date']) for w in cal['weeks']]
+    starts = [c for c in range(COLS) if c == 0 or firsts[c].month != firsts[c - 1].month]
+    for i, c in enumerate(starts):
+        nxt = starts[i + 1] if i + 1 < len(starts) else COLS
+        if nxt - c < 2: continue          # 1列しかない月は出さない（本物と同じ）
+        s.append(f'<text x="{X(c)}" y="{Y(0) - 6}" fill="{t["fg"]}">{firsts[c].strftime("%b")}</text>')
+    for r, name in ((1, 'Mon'), (3, 'Wed'), (5, 'Fri')):
+        s.append(f'<text x="{LEFT - 31}" y="{Y(r) + 9}" fill="{t["fg"]}">{name}</text>')
+    y0 = Y(0)
+    s.append(f'<text x="{LEFT - 2}" y="{y0 + 108}" fill="{t["muted"]}">Learn how we count contributions</text>')
+    s.append(f'<text x="{LEFT + 528}" y="{y0 + 108}" fill="{t["muted"]}">Less</text>')
+    for k in range(5):
+        s.append(f'<rect x="{LEFT + 560 + 14 * k}" y="{y0 + 99}" width="10" height="10" rx="2" fill="{t["cells"][k]}"/>')
+    s.append(f'<text x="{LEFT + 631}" y="{y0 + 108}" fill="{t["muted"]}">More</text>')
+    s.append('</g>')
+    return ''.join(s)
 
 
 for th, t in THEMES.items():
