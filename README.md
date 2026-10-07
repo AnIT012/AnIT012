@@ -1,6 +1,7 @@
 # AnIT
 
 PdMを志望している、情報系の学部3年生です。身近な困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらいながら作っています。
+
 [ポートフォリオ](https://portfolio-site-navy-theta-52.vercel.app) ・ [Zenn](https://zenn.dev/anit)
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-dark.svg">
