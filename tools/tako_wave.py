@@ -499,11 +499,6 @@ def hero(t, wt):
         rects_ = ''.join(f'<rect x="{hx(c0 + cc)}" y="{hy(r)}" width="{HB}" height="{HB}" rx="1.6" fill="{t["fg"]}"/>'
                          for r, row in enumerate(rows) for cc, ch in enumerate(row) if ch == '1')
         body.append(f'<g style="animation:L{name} {HD}s linear infinite">{rects_}</g>')
-    # 「built with AI」のバッジ（たこの色）
-    bx, by = hx(21) + 16, hy(3) - 6
-    body.append(f'<g font-family="Verdana,DejaVu Sans,sans-serif" font-size="11"><rect x="{bx}" y="{by}" width="62" height="20" rx="3" fill="#555"/>'
-                f'<rect x="{bx + 62}" y="{by}" width="26" height="20" rx="3" fill="{t["tako"]}"/><rect x="{bx + 62}" y="{by}" width="4" height="20" fill="{t["tako"]}"/>'
-                f'<text x="{bx + 7}" y="{by + 14}" fill="#fff">built with</text><text x="{bx + 68}" y="{by + 14}" fill="#fff">AI</text></g>')
     # 自己紹介
     font = 'font-family="-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,&quot;Hiragino Sans&quot;,&quot;Noto Sans JP&quot;,&quot;Noto Sans&quot;,Meiryo,sans-serif" font-size="14"'
     body.append(f'<g {font} fill="{t["fg"]}">' + ''.join(f'<text x="{LEFT}" y="{y}">{txt}</text>' for txt, y, _ in INTRO) + '</g>')
