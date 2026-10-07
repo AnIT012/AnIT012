@@ -1,51 +1,19 @@
-<div align="center">
+# AnIT
 
-# AnIT 🍵
+PdMを志望している、情報系の学部3年生です。身近な困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらいながら作っています。TOEICは905点です。
 
-### PdM志望 ｜ 要件定義・設計を担当、実装はAIを駆使 ｜ 身近な課題を 0→1 でプロダクト化
+[ポートフォリオ](https://portfolio-site-navy-theta-52.vercel.app) ・ [Zenn](https://zenn.dev/anit)
 
-![role](https://img.shields.io/badge/role-PdM志望-1D76DB?style=for-the-badge)
-![style](https://img.shields.io/badge/設計-自分-0E8A16?style=for-the-badge)
-![style2](https://img.shields.io/badge/実装-AIを駆使-8A2BE2?style=for-the-badge)
+## 作ったもの
 
-情報系の学部3年生 ｜ TOEIC 905
+- [就活Hub](https://github.com/AnIT012/shukatsu-hub)：就活の選考の進み具合とやることを管理するアプリです。（[公開しています](https://shukatsu-dashboard-sable.vercel.app)）
+- [Ponte](https://github.com/AnIT012/Ponte)：AIと開発するときに、決めていないことをAIに推測させないための言語です。（[試せます](https://anit012.github.io/Ponte/play.html)）
+- [TeaMy](https://github.com/AnIT012/TeaMy-design)：複数のAIがDiscordで話し合って成果物を作る仕組みの、設計の記録です。
+- [mamebot](https://github.com/AnIT012/mamebot)：家族で使っているLINEボットです。
+- [Teyvat Codex](https://teyvat-codex.pages.dev)：原神の物語と仕様を調べられる、非公式の資料サイトです。
+- [Irori](https://github.com/AnIT012/Irori-app)：家族の予定ややることを1つの画面にまとめた、家庭用のアプリです。
+- [MyAgent](https://github.com/AnIT012/MyAgent)：話しかけるだけで、パソコンの操作や予定の確認ができる音声アシスタントです。
+- [CreateAI](https://github.com/AnIT012/CreateAI)：いくつものアプリをまたいで使える、ローカルLLMのAIエージェントです。
+- [PlanPal](https://github.com/AnIT012/PlanPal)：使う人のことを学んで、ふだんの言葉から予定を提案するカレンダーです。
 
-</div>
-
----
-
-## 🧭 つくり方
-
-> **自分が使いたい・身近な人が困っている課題を見つけ、要件定義から設計・UI動線・トレードオフ判断までを自分で行い、実装にAIを最大限活用して 0→1 で形にする。**
-
-技術スタックや設計の判断は理解した上で意思決定し、作って終わりではなく **実運用まで持っていく** ことを大事にしています。
-
----
-
-## 🚀 代表プロダクト
-
-| | プロダクト | 概要 |
-|---|---|---|
-| 🍵 | **[TeaMy-design](https://github.com/annonymousIT/TeaMy-design)** | 自分専用のAIチームがDiscordで議論し成果物を納品するシステムの **設計判断ログ**（実装は非公開・思考だけ公開） |
-| 🫘 | **[mamebot](https://github.com/annonymousIT/mamebot)** | 家族4人で **本稼働中** のLINEボット。Webアプリから「使われる形」へピボットした 0→1 |
-| 📅 | **[PlanPal](https://github.com/annonymousIT/PlanPal)** | あなたを学ぶ **AIカレンダー**（Go + Next.js + Gemini）。自然言語で予定提案 |
-
----
-
-## 🛠 よく使う道具
-
-![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
-![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
-![LLM](https://img.shields.io/badge/LLM-Claude%20%2F%20GPT%20%2F%20Gemini-FF6F61)
-
----
-
-<div align="center">
-
-📝 [Zenn](https://zenn.dev/anit) ｜ 身近な「あったらいいな」を、最短で動くものにします。
-
-</div>
+よく使うもの：Python、Go、TypeScript（Next.js）、PostgreSQL、Firebase、Docker、Claude・GPT・Gemini
