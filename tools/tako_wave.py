@@ -57,20 +57,33 @@ LEGS_A = ["1.1.11.1.1", "1..1..1..1"]
 LEGS_B = [".1.1..1.1.", ".1..11..1."]
 CHEEKS = [(1, 5), (8, 5)]   # ほっぺ
 # ── キャラ：ブロックの子（草のマスと同じ四角・頭に芽・べに・ほっぺ）。1=体 e=目 c=ほっぺ g=芽 d=足 ──
-CHARA = [".....gg.....", "....g.......", "..11111111..", "..11111111..", "..1e1111e1..", "..1e1111e1..", "..c111111c..", "..11111111..", "...d....d..."]
+CHARA = [".....gg.....", "....g.......", "..11111111..", "..11111111..", "..11111111..", "..11111111..", "..c111111c..", "..11111111..", "...d....d..."]
+# 目：正面・右・左・上・下を見る、喜んだ「＞＜」
+FACES = {
+    'f': [(3, 4), (3, 5), (8, 4), (8, 5)],
+    'r': [(4, 4), (4, 5), (9, 4), (9, 5)],
+    'l': [(2, 4), (2, 5), (7, 4), (7, 5)],
+    'u': [(3, 3), (3, 4), (8, 3), (8, 4)],
+    'd': [(3, 5), (3, 6), (8, 5), (8, 6)],
+    'j': [(3, 3), (4, 4), (3, 5), (8, 3), (7, 4), (8, 5)],
+}
 CHARA_BLINK = [(3, 4), (8, 4)]          # まばたきで隠す目の上の段
 CPX = 3.0                               # ドット1つの大きさ
 
 
-def chara(t, px=CPX, feet=False, blink=False):
-    """feet=True なら原点が足の下のまん中、False なら絵のまん中"""
+def chara(t, px=CPX, feet=False, blink=False, faces=None, prefix=''):
+    """feet=True なら原点が足の下のまん中、False なら絵のまん中。faces を渡すと表情ごとに class を付ける（切り替えは face_css で）"""
     w, h = 12 * px, 9 * px
     ox, oy = -w / 2, (-h if feet else -h / 2)
     col = {'1': t['tako'], 'e': t['eye'], 'c': t['cheek'], 'g': t['sprout'], 'd': t['feet']}
     r = [f'<rect x="{x*px + ox:.2f}" y="{y*px + oy:.2f}" width="{px+.05:.2f}" height="{px+.05:.2f}" fill="{col[ch]}"/>'
          for y, row in enumerate(CHARA) for x, ch in enumerate(row) if ch != '.']
+    for name in (faces or ['f']):
+        cls = f' class="{prefix}{name}"' if faces else ''
+        r.append(f'<g{cls} fill="{t["eye"]}">' + ''.join(f'<rect x="{x*px + ox:.2f}" y="{y*px + oy:.2f}" width="{px+.05:.2f}" height="{px+.05:.2f}"/>' for x, y in FACES[name]) + '</g>')
     if blink:
-        r.append('<g class="bk">' + ''.join(f'<rect x="{x*px + ox:.2f}" y="{y*px + oy:.2f}" width="{px+.05:.2f}" height="{px+.05:.2f}" fill="{t["tako"]}"/>' for x, y in CHARA_BLINK) + '</g>')
+        # まばたき：正面の目の上の段だけ体の色でかくす（正面の時だけ出す）
+        r.append(f'<g class="{prefix}f"><g class="bk">' + ''.join(f'<rect x="{x*px + ox:.2f}" y="{y*px + oy:.2f}" width="{px+.05:.2f}" height="{px+.05:.2f}" fill="{t["tako"]}"/>' for x, y in CHARA_BLINK) + '</g></g>')
     return ''.join(r)
 EYES = {
     'open': [(2, 3), (2, 4), (7, 3), (7, 4)],
@@ -134,6 +147,22 @@ for c in range(COLS):
 
 
 TOFF, TSC, PARTS = 0.0, 1.0, False   # 上の大きな絵に入れる時：時刻 p → TOFF + p×TSC、絵の枠を付けずに中身だけ返す
+
+
+def face_css(prefix, windows, dur, to_pct, secs):
+    """windows: [(始め, 終わり, 表情)]。そのあいだだけその目を出す。当たらない時は正面。値はコマ送り（次の区切りまで保つ）"""
+    out = []
+    for name in sorted({w[2] for w in windows} | {'f'}):
+        base = 1 if name == 'f' else 0
+        dd = {0.0: base}
+        for a, b, n in sorted(windows):
+            dd[round(min(dur, max(0, a)), 4)] = 1 if n == name else 0
+            dd[round(min(dur, max(0, b)), 4)] = base
+        st = sorted(dd.items())
+        pre = f'0%{{opacity:{base}}}' if to_pct(0) > 0 else ''
+        out.append(f'@keyframes {prefix}{name}{{{pre}' + ''.join(f'{to_pct(sec):.3f}%{{opacity:{v}}}' for sec, v in st) + '}'
+                   + f'.{prefix}{name}{{animation:{prefix}{name} {secs}s step-end infinite}}')
+    return out
 
 
 def kf(name, stops):
@@ -313,8 +342,9 @@ def build(t, wt):
         st.append((T1 - 6 + 9 * u, tr(xe + 18 * u, Yb - 30 * math.sin(math.pi * u) + 46 * u * u, f' rotate({360 * u:.0f}deg)') + ';opacity:1'))
     st += [(T1 + 3.1, tr(xe + 18, Yb + 46, ' rotate(360deg)') + ';opacity:0'), (100, tr(X(0) - 30, Yb, ' rotate(0deg)') + ';opacity:0')]
     css.append(kf('sf', st) + f'.sf{{animation:sf {DUR}s linear infinite}}')
+    css += face_css('sv', [(T0, T1 - 6, 'r'), (T1 - 6, 100, 'j')], 100, lambda p: TOFF + p * TSC, DUR)
     board = f'<rect x="-16" y="{9 * CPX / 2 - 4:.1f}" width="32" height="3.6" rx="1.8" fill="{t["ink"]}"/>'
-    body.append(f'<g class="sf"><g transform="translate(0,-4)">{chara(t, blink=True)}</g>{board}</g>')
+    body.append(f'<g class="sf"><g transform="translate(0,-4)">{chara(t, blink=True, faces=['f', 'r', 'j'], prefix='sv')}</g>{board}</g>')
     # ── 最後のざぶーん：草と同じマスで、水が噴き出す（冠 → しずくが上がって落ちる）。そのあと水があふれる ──
     c0, a = C0, SPLASH
     def sfc_at(c, p):                                # その列・その時の水面の行（積もった草より下にはならない）
@@ -404,7 +434,18 @@ def hp(sec): return sec / HD * 100
 
 
 def hero_tako(t):
-    return chara(t, feet=True, blink=True)
+    return chara(t, feet=True, blink=True, faces=['f', 'r', 'l', 'u', 'd', 'j'], prefix='hv')
+
+
+def hero_faces():
+    w = [(0, 1.25, 'r'), (1.25, 2.2, 'u'), (2.4, 2.85, 'r'), (2.85, 3.6, 'd'), (3.8, 4.55, 'r'), (4.55, 5.3, 'd'),
+         (5.3, 7.0, 'j'), (7.0, 7.8, 'u'), (7.9, 8.8, 'r'), (9.0, 10.4, 'j'), (10.4, 11.4, 'd'),
+         (11.6, 13.4, 'r'), (13.4, 14.0, 'd'), (14.1, 16.9, 'l'), (16.9, 17.5, 'd'), (17.6, 20.4, 'r'), (20.4, 21.0, 'd'),
+         (21.1, 23.8, 'l'), (23.8, 24.5, 'd'), (24.5, 26.2, 'r')]
+    rip = W0 + (R0 + abs(0 - CENTER[0]) * RV) * DUR_W / 100
+    handoff = W0 + (T0 + 1.5) * DUR_W / 100
+    w += [(rip - .1, rip + .8, 'u'), (rip + .8, handoff - .7, 'r'), (handoff - .7, HD, 'j')]
+    return [(a, b, n) for a, b, n in w if b > a]
 
 
 def hero_path():
@@ -505,6 +546,7 @@ def hero(t, wt):
     body.append(f'<g transform="translate(0,{WY})">{wbody}</g>')
     css.append(f'@keyframes hk{{' + ''.join(f'{p:.3f}%{{{v}}}' for p, v in hero_path()) + '}' + f'.hk{{animation:hk {HD}s linear infinite}}')
     body.append(f'<g class="hk">{hero_tako(t)}</g>')
+    css += face_css('hv', hero_faces(), HD, hp, HD)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {HW} {HH}" width="{HW}" height="{HH}">'
             f'<title>AnIT</title><style>{LEG_CSS}{"".join(css)}@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}.hk{{opacity:0}}}}</style>'
             f'<rect width="{HW}" height="{HH}" fill="{t["bg"]}"/>{"".join(body)}</svg>')
