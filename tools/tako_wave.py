@@ -36,16 +36,19 @@ for c, w in enumerate(cal['weeks']):
 COLS = len(cal['weeks'])
 GRASS = [d for d in days if d[2]]
 P, CELL, PAD, TOPM = 13, 10, 12, 34
+LEFT = PAD + 31            # 左に曜日（本物と同じく、マスの31px左）
+FOOT = 123                 # マスの上端から、下の「Learn how…」「Less □ More」の下まで
 GW = COLS * P - 3
-W = PAD * 2 + GW + 30
-H = TOPM + PAD * 2 + 7 * P - 3
-def X(c): return PAD + c * P
+W = LEFT + GW + PAD + 30
+H = TOPM + PAD + FOOT
+def X(c): return LEFT + c * P
 def Y(r): return TOPM + PAD + r * P
 
 # GitHub の草の色（ライト／ダーク）と、たこの色
 THEMES = {
-    'light': dict(bg='#ffffff', cells=['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'], tako='#d97757', eye='#1f2328', ink='#2b2320'),
-    'dark': dict(bg='#0d1117', cells=['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'], tako='#e08a6c', eye='#0d1117', ink='#c9d1d9'),
+    # 草の色・文字の色は、GitHub のプロフィールの本物から測った値（2026-10-07）
+    'light': dict(bg='#ffffff', cells=['#eff2f5', '#aceebb', '#4ac26b', '#2da44e', '#116329'], fg='#1f2328', muted='#59636e', tako='#d97757', eye='#1f2328', ink='#2b2320'),
+    'dark': dict(bg='#0d1117', cells=['#151b23', '#033a16', '#196c2e', '#2ea043', '#56d364'], fg='#f0f6fc', muted='#9198a1', tako='#e08a6c', eye='#0d1117', ink='#c9d1d9'),
 }
 
 # ── 自作のたこ。体・目（表情ごと）・足（2コマ）を分けて、表情を切り替えられるように ──
@@ -98,8 +101,7 @@ CENTER = ((COLS - 1) / 2, 3)
 S0 = 15                   # 草が沈み始める
 T0, T1 = 30, 76           # 波の頂上が左の外→右の外へ
 X0, X1 = -4.0, COLS + 2.0
-D0 = 86                   # 水が引き始める
-U0 = 88                   # 草が浮かんで戻り始める
+D0 = 200                  # （たまった水は、最後に下の「水だけ捌ける」で引く）
 BASE = 2                  # たまる水の深さ（下から2段）
 
 # 列ごとの床の高さ（その週に草があった日数）と、草それぞれの行き先
@@ -161,6 +163,23 @@ def level(c, r, p):
     return int(h + .35)
 
 
+XE = X(0) + crest(T1 - 6) * P + 4                  # たこが宙返りして落ちる所
+C0 = max(0, min(COLS - 1, round((XE + 18 - LEFT - CELL / 2) / P)))
+SPLASH = T1 + 1.5
+RC0 = max(1, min(6, 7 - max(level(C0, 0, SPLASH), floor[C0])))
+FL0 = SPLASH + 2.6                                  # 冠が上がりきってから、水があふれ始める
+
+
+def flood_at(c, r):
+    """ざぶーんの所から波紋状に、そのマスが水で埋まる時刻"""
+    return FL0 + math.hypot(c - C0, (r - RC0) * 1.2) * .12
+
+
+def drain_at(r):
+    """水が上の段から捌けていく時刻"""
+    return 90 + r * .9
+
+
 def lip(c, p):
     if not (T0 <= p <= T1): return set()
     x = crest(p); d = x - c
@@ -190,7 +209,7 @@ def build(t, wt):
         prev = (empty, 1.0)
         for p in steps:
             h = level(c, r, p)
-            onfloor = r >= 7 - floor[c] and p >= S0 + 6 and p < U0 + 6
+            onfloor = r >= 7 - floor[c] and p >= S0 + 6
             if r in lip(c, p): col = wt['foam']
             elif h > 0 and r >= 7 - h and not onfloor: col = water_color(wt, r, h)
             else: col = empty
@@ -200,6 +219,11 @@ def build(t, wt):
                 if 0 <= u <= 1:
                     sc = max(sc, 1 + amp * math.sin(math.pi * u))
                     if col == empty: col = wc
+            tfc = flood_at(c, r)
+            if p >= tfc:                                   # ざぶーんのあと、波紋状に水が埋まる → 上から捌ける
+                if p >= drain_at(r): col = empty
+                elif p < tfc + .6 or (r > 0 and p >= drain_at(r - 1)): col = wt['foam']
+                else: col = wt['w'][(0, 0, 1, 1, 2, 2, 3)[r]]
             sc = round(sc, 2)
             if (col, sc) != prev:
                 if col != prev[0]: st.append((p - .01, f'fill:{prev[0]};transform:scale({prev[1]})'))
@@ -228,12 +252,12 @@ def build(t, wt):
         # 波が上を通る時、床がほんの少し沈む
         pc = T0 + (T1 - T0) * (c - X0) / (X1 - X0)
         st += [(pc - .5, tr(0, dy, ' scale(1)')), (pc + .3, tr(0, dy + 1.5, ' scale(1)')), (pc + 1.5, tr(0, dy, ' scale(1)'))]
-        a = U0 + (COLS - 1 - c) * .06 + (6 - r) * .15
+        a = flood_at(c, dest[idx]) + .4                    # 水が来たら、ふわっと浮いて自分の日へ
         st.append((a, tr(0, dy, ' scale(1)')))
         for k in range(1, 9):
             u = k / 8
             e = 1 - (1 - u) ** 2
-            st.append((a + 4 * u, tr(0, dy * (1 - e), ' scale(1)')))
+            st.append((a + 3.5 * u, tr(0, dy * (1 - e) - 3 * math.sin(math.pi * u), ' scale(1)')))
         st.append((100, tr(0, 0, ' scale(1)')))
         st.sort(key=lambda x: x[0])
         css.append(kf(f'g{idx}', st))
@@ -265,18 +289,61 @@ def build(t, wt):
     css.append(kf('sf', st) + f'.sf{{animation:sf {DUR}s linear infinite}}')
     board = f'<rect x="-14" y="9.5" width="28" height="3.6" rx="1.8" fill="{t["ink"]}"/>'
     body.append(f'<g class="sf"><g transform="translate(0,-4)">{tako(t, 2.0, eyes=("happy",))}</g>{board}</g>')
-    sx, sy = xe + 18, Y(3)
-    for i in range(18):
-        ang = math.pi * (1.05 + .9 * i / 17)
-        dist = 16 + (i % 4) * 9
-        dx, dy = math.cos(ang) * dist, math.sin(ang) * dist - 6
-        a = T1 + 3
-        css.append(kf(f'dr{i}', [(0, 'opacity:0;' + tr(0, 0)), (a, 'opacity:0;' + tr(0, 0)), (a + .3, 'opacity:1;' + tr(0, 0)), (a + 3, 'opacity:1;' + tr(dx, dy)), (a + 6, 'opacity:0;' + tr(dx * 1.2, dy + 14)), (100, 'opacity:0;' + tr(0, 0))]))
-        sz = 4 if i % 2 else 3
-        body.append(f'<rect x="{sx:.1f}" y="{sy}" width="{sz}" height="{sz}" rx=".6" fill="{wt["foam"] if i % 3 == 0 else wt["w"][i % 2]}" style="animation:dr{i} {DUR}s ease-out infinite"/>')
+    # ── 最後のざぶーん：草と同じマスで、水が噴き出す（冠 → しずくが上がって落ちる）。そのあと水があふれる ──
+    c0, a = C0, SPLASH
+    def sfc_at(c, p):                                # その列・その時の水面の行（積もった草より下にはならない）
+        c = max(0, min(COLS - 1, c))
+        return max(1, min(6, 7 - max(level(c, 0, p), floor[c])))
+    F, Z, O = 'f', 0, 1
+    def col(n, top, kind_top=F, kind=O): return [(n, u, kind_top if u == top else kind) for u in range(1, top + 1)]
+    frames = [
+        [(0, 1, F), (-1, 1, Z), (1, 1, Z)],
+        col(-2, 2) + col(-1, 3, F, Z) + [(0, 1, Z)] + col(1, 3, F, Z) + col(2, 2),
+        col(-3, 1) + col(-2, 3) + col(-1, 4, F, Z) + col(0, 2, F, Z) + col(1, 4, F, Z) + col(2, 3) + col(3, 1)
+        + [(0, 6, F), (-2, 6, Z), (2, 7, Z), (-3, 5, F), (3, 5, F)],
+        col(-4, 1, F) + col(-3, 1) + col(-2, 2) + col(-1, 3, F, Z) + col(1, 3, F, Z) + col(2, 2) + col(3, 1) + col(4, 1, F)
+        + [(0, 7, F), (-2, 7, Z), (2, 8, Z), (-4, 5, F), (4, 6, F)],
+        col(-5, 1, F) + col(-4, 1) + col(-3, 1) + col(-2, 1) + col(-1, 2, F, Z) + col(1, 2, F, Z) + col(2, 1) + col(3, 1) + col(4, 1) + col(5, 1, F)
+        + [(0, 5, F), (-2, 5, Z), (2, 6, Z), (-5, 3, F), (5, 4, F)],
+    ]
+    STEP = 1.3
+    color_of = {F: wt['foam'], Z: wt['w'][0], O: wt['w'][1]}
+    k = 0
+    for fi, fr in enumerate(frames):
+        f0, f1 = a + fi * STEP, a + (fi + 1) * STEP
+        for dc, up, kind in fr:
+            c = c0 + dc
+            r = sfc_at(c, f0) - up               # 各列の水面の上に積む
+            x, y = X(c), Y(r)
+            if r < -3 or not 0 <= c < COLS: continue      # 草の外の列には出さない（水がないので浮いて見える）
+            css.append(kf(f'z{k}', [(0, 'opacity:0'), (f0 - .01, 'opacity:0'), (f0, 'opacity:1'), (f1 - .01, 'opacity:1'), (f1, 'opacity:0'), (100, 'opacity:0')]))
+            body.append(f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" fill="{color_of[kind]}" style="opacity:0;animation:z{k} {DUR}s linear infinite"/>')
+            k += 1
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
             f'<style>{LEG_CSS}{"".join(css)}@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}}}</style>'
-            f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>{"".join(body)}</svg>')
+            f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>{labels(t)}{"".join(body)}</svg>')
+
+
+def labels(t):
+    """本物の草と同じ文字：上に月、左に Mon/Wed/Fri、下に「Learn how we count contributions」と「Less □□□□□ More」"""
+    font = 'font-family="-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,&quot;Noto Sans&quot;,Helvetica,Arial,sans-serif" font-size="12"'
+    s = [f'<g {font}>']
+    firsts = [datetime.date.fromisoformat(w['contributionDays'][0]['date']) for w in cal['weeks']]
+    starts = [c for c in range(COLS) if c == 0 or firsts[c].month != firsts[c - 1].month]
+    for i, c in enumerate(starts):
+        nxt = starts[i + 1] if i + 1 < len(starts) else COLS
+        if nxt - c < 2: continue          # 1列しかない月は出さない（本物と同じ）
+        s.append(f'<text x="{X(c)}" y="{Y(0) - 6}" fill="{t["fg"]}">{firsts[c].strftime("%b")}</text>')
+    for r, name in ((1, 'Mon'), (3, 'Wed'), (5, 'Fri')):
+        s.append(f'<text x="{LEFT - 31}" y="{Y(r) + 9}" fill="{t["fg"]}">{name}</text>')
+    y0 = Y(0)
+    s.append(f'<text x="{LEFT - 2}" y="{y0 + 108}" fill="{t["muted"]}">Learn how we count contributions</text>')
+    s.append(f'<text x="{LEFT + 528}" y="{y0 + 108}" fill="{t["muted"]}">Less</text>')
+    for k in range(5):
+        s.append(f'<rect x="{LEFT + 560 + 14 * k}" y="{y0 + 99}" width="10" height="10" rx="2" fill="{t["cells"][k]}"/>')
+    s.append(f'<text x="{LEFT + 631}" y="{y0 + 108}" fill="{t["muted"]}">More</text>')
+    s.append('</g>')
+    return ''.join(s)
 
 
 for th, t in THEMES.items():
