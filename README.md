@@ -4,6 +4,11 @@ PdMを志望している、情報系の学部3年生です。身近な困りご�
 
 [ポートフォリオ](https://portfolio-site-navy-theta-52.vercel.app) ・ [Zenn](https://zenn.dev/anit)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-dark.svg">
+  <img alt="この1年の草の上で、たこが波乗りするアニメーション" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-light.svg">
+</picture>
+
 ## 作ったもの
 
 - [就活Hub](https://github.com/AnIT012/shukatsu-hub)：就活の選考の進み具合とやることを管理するアプリです。（[公開しています](https://shukatsu-dashboard-sable.vercel.app)）
