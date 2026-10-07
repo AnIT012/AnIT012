@@ -16,6 +16,13 @@
 
 </div>
 
+<div align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-dark.svg">
+  <img alt="この1年の草の上で、たこが波乗りするアニメーション" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-wave-light.svg">
+</picture>
+</div>
+
 ---
 
 ## 🧭 つくり方
