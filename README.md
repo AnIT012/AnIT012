@@ -9,10 +9,17 @@
 　　
 ## 作ったもの　What I've built
 
-<a href="https://portfolio-site-navy-theta-52.vercel.app/projects/shukatsu"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-shukatsu-dark.svg"><img width="32%" alt="就活Hub：次の一手が前に出て、動いた歩数で花畑が育つ就活管理アプリ。10名以上が利用" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-shukatsu-light.svg"></picture></a> <a href="https://portfolio-site-navy-theta-52.vercel.app/projects/teamy"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-teamy-dark.svg"><img width="32%" alt="TeaMy：8人格のAIが工程ごとに議論して結論を出すAIチーム。コスト約1/3" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-teamy-light.svg"></picture></a> <a href="https://portfolio-site-navy-theta-52.vercel.app/projects/mamebot"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-mamebot-dark.svg"><img width="32%" alt="mamebot：LINEのボタンだけで家族に連絡が届くLINEボット。家族4人が毎日利用" src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/works-mamebot-light.svg"></picture></a>
+- [nihongo](https://github.com/AnIT012/nihongo)：AIが書く日本語を人が書く文に近づける、エージェントスキルです。GitHubのスターは80を超えました。<br>
+  An agent skill that makes AI-written Japanese read like a person wrote it. 80+ stars on GitHub.
 
-押すと、課題から読めます（ポートフォリオ）。　Click a card to read the case study.<br>
-コード Code：[就活Hub](https://github.com/AnIT012/shukatsu-hub)（[公開中 Live](https://shukatsu-dashboard-sable.vercel.app)）・ [TeaMy の設計の記録 Design notes](https://github.com/AnIT012/TeaMy-design) ・ [mamebot](https://github.com/AnIT012/mamebot)
+- [就活Hub](https://portfolio-site-navy-theta-52.vercel.app/projects/shukatsu)：「次の一手」が主役の就活管理アプリです。10名以上が使っています。（[コード](https://github.com/AnIT012/shukatsu-hub)・[公開中](https://shukatsu-dashboard-sable.vercel.app)）<br>
+  A job-hunting app built around "your next move." Used by 10+ people. ([Code](https://github.com/AnIT012/shukatsu-hub) · [Live](https://shukatsu-dashboard-sable.vercel.app))
+
+- [TeaMy](https://portfolio-site-navy-theta-52.vercel.app/projects/teamy)：8人のAIチームが話し合い、そのまま使える1枚にして渡します。コストは約1/3（1タスク20円前後）です。（[設計の記録](https://github.com/AnIT012/TeaMy-design)）<br>
+  A team of eight AIs discusses the task and hands back a ready-to-use page, at about 1/3 the cost (around 20 yen per task). ([Design notes](https://github.com/AnIT012/TeaMy-design))
+
+- [mamebot](https://portfolio-site-navy-theta-52.vercel.app/projects/mamebot)：LINEのボタンだけで、家族に連絡が届くLINEボットです。家族4人が毎日使っています。（[コード](https://github.com/AnIT012/mamebot)）<br>
+  A LINE bot that messages the family with one button. Used daily by a family of four. ([Code](https://github.com/AnIT012/mamebot))
 
 ### ほかに作ったもの　Other works
 
