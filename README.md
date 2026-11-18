@@ -1,12 +1,8 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-hero-dark.svg">
-  <img alt="AnIT。PdM・SA・TS・DX人材志望の大学3年生です。自分や周りの困りごとを見つけて、要件と設計を自分で考え、実装はAIに手伝ってもらってプロダクトを作っています。Aspiring PdM, solutions architect, technical support engineer, or DX specialist. I find problems around me, design the requirements myself, and build products with AI." src="https://raw.githubusercontent.com/AnIT012/AnIT012/output/tako-hero-light.svg">
-</picture>
+PdM・SA・TS・DX人材志望の大学3年生です。自分や周りの困りごとを見つけて、要件と設計を自分で考えています。実装はAIに手伝ってもらい、プロダクトにしています。<br>
+Aspiring PdM, solutions architect, technical support engineer, or DX specialist. I find problems around me, design the requirements myself, and build products with AI.
 
-　　　[ポートフォリオ Portfolio](https://portfolio-site-navy-theta-52.vercel.app) ・ [記事 Articles (Zenn)](https://zenn.dev/anit)
-　　
+[ポートフォリオ Portfolio](https://portfolio-site-navy-theta-52.vercel.app) ・ [記事 Articles (Zenn)](https://zenn.dev/anit)
 
-　　
 ## 作ったもの　What I've built
 
 - [nihongo](https://github.com/AnIT012/nihongo)：AIが書く日本語を人が書く文に近づける、エージェントスキルです。GitHubのスターは80を超えました。<br>
